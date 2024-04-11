@@ -75,6 +75,10 @@ vim.opt.termguicolors = true
 vim.opt.background = 'dark'
 vim.cmd.colorscheme 'molokai'
 
+-- disable netrw for nvim-tree
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -95,6 +99,8 @@ vim.keymap.set('n', ']Q', vim.cmd.clast, { desc = 'Last in qfixlist' })
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
+--  TODO tmux integration ?? see old config
+--  TODO highlight TODOs
 vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
@@ -712,7 +718,7 @@ require('lazy').setup({
           end, { 'i', 's' }),
 
           -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-          --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymapsini
+          --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
         },
         sources = {
           { name = 'nvim_lsp' },
@@ -840,20 +846,25 @@ require('lazy').setup({
     ft = { 'rust' },
   },
   {
-    'nvim-neo-tree/neo-tree.nvim',
-    branch = 'v3.x',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
-      'MunifTanjim/nui.nvim',
-      -- '3rd/image.nvim', -- Optional image support in preview window: See `# Preview Mode` for more information
-    },
+    'nvim-tree/nvim-tree.lua',
     config = function()
-      require('neo-tree').setup()
+      require('nvim-tree').setup {
+        sync_root_with_cwd = true,
+        respect_buf_cwd = true,
+        view = {
+          width = 40,
+        },
+        update_focused_file = {
+          enable = true,
+          update_root = true,
+        },
+        filters = {
+          git_ignored = false,
+          dotfiles = false,
+        },
+      }
 
-      vim.keymap.set('n', '<leader>e', function()
-        vim.cmd.Neotree 'toggle'
-      end, { desc = 'Toggle NeoTree' })
+      vim.keymap.set('n', '<leader>e', vim.cmd.NvimTreeToggle, { desc = 'Toggle NvimTree' })
     end,
   },
   {
