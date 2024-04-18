@@ -58,8 +58,6 @@ vim.opt.splitbelow = true
 --  and `:help 'listchars'`
 vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-vim.opt.tabstop = 2
-vim.opt.softtabstop = 2
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -854,18 +852,14 @@ require('lazy').setup({
     'nvim-tree/nvim-tree.lua',
     config = function()
       require('nvim-tree').setup {
-        -- on_attach = function(bufnr)
-        --   local api = require 'nvim-tree.api'
-        --   local function opts(desc)
-        --     return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
-        --   end
-        --   vim.keymap.set('n', '<Tab>', api.node.open.preview_no_picker, opts 'Up')
-        -- end,
+        sync_root_with_cwd = true,
+        respect_buf_cwd = true,
         view = {
           width = 40,
         },
         update_focused_file = {
           enable = true,
+          update_root = true,
         },
         filters = {
           git_ignored = false,
