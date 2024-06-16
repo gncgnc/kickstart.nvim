@@ -570,11 +570,17 @@ require('lazy').setup({
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for tsserver)
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+
             require('lspconfig')[server_name].setup(server)
           end,
           -- noop to make rustaceanvim work:
           -- https://github.com/mrcjkb/rustaceanvim/blob/ee9451b5b58193e4b5d8c803b6edb7fb8f9d16b3/doc/mason.txt#L35-L37
           ['rust_analyzer'] = function() end,
+          ['tsserver'] = function()
+            return {
+              format_on_save = false,
+            }
+          end,
         },
       }
 
