@@ -511,6 +511,12 @@ require('lazy').setup({
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
+        volar = { enabled = true },
+        vtsls = {
+          enabled = true,
+          filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+          settings = {},
+        },
         lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
@@ -542,6 +548,24 @@ require('lazy').setup({
         handlers = {
           function(server_name)
             local server = servers[server_name] or {}
+
+            -- yanked from: https://github.com/yioneko/vtsls/issues/148#issuecomment-2094004455
+            if server_name == 'vtsls' then
+              server.settings.vtsls = {
+                tsserver = {
+                  globalPlugins = {
+                    {
+                      name = '@vue/typescript-plugin',
+                      location = require('mason-registry').get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server',
+                      languages = { 'vue' },
+                      configNamespace = 'typescript',
+                      enableForWorkspaceTypeScriptVersions = true,
+                    },
+                  },
+                },
+              }
+            end
+
             -- This handles overriding only values explicitly passed
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for tsserver)
@@ -626,7 +650,11 @@ require('lazy').setup({
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        -- javascript = { { "prettierd", "prettier" } },
+        javascript = { 'prettier' },
+        typescript = { 'prettier' },
+        typescriptreact = { 'prettier' },
+        vue = { 'prettier' },
+        json = { 'jq' },
       },
     },
   },
@@ -785,7 +813,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'python', 'typescript', 'tsx', 'html', 'rust', 'glsl' },
+      ensure_installed = { 'bash', 'c', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'python', 'typescript', 'tsx', 'html', 'rust', 'glsl', 'vue' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
