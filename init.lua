@@ -600,12 +600,12 @@ require('lazy').setup({
             end, { desc = 'Toggle LSP inlay hints' })
           end,
 
-          default_settings = {
+          settings = {
             -- rust-analyzer language server configuration
             ['rust-analyzer'] = {
-              cargo = { target = 'wasm32-unknown-unknown' },
+              -- cargo = { target = 'wasm32-unknown-unknown' },
               checkOnSave = {
-                command = 'clippy --workspace',
+                command = 'clippy',
               },
               files = {
                 excludeDirs = {
