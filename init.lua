@@ -75,7 +75,21 @@ vim.opt.scrolloff = 10
 vim.opt.termguicolors = true
 
 vim.opt.background = 'dark'
-vim.cmd.colorscheme 'molokai'
+vim.keymap.set('n', '<leader>tt', function()
+  if vim.g.__bg == 'light' then
+    vim.g.__bg = 'dark'
+    require('gruvbox').setup { contrast = 'hard', transparent_mode = true }
+    io.popen 'sed -i.bkp -e "s/gruvbox_light/gruvbox_dark/" ~/.config/alacritty/alacritty.yml'
+    vim.opt.background = 'dark'
+    vim.cmd.colorscheme 'gruvbox'
+  else
+    vim.g.__bg = 'light'
+    require('gruvbox').setup { contrast = 'soft', transparent_mode = true }
+    io.popen 'sed -i.bkp -e "s/gruvbox_dark/gruvbox_light/" ~/.config/alacritty/alacritty.yml'
+    vim.opt.background = 'light'
+    vim.cmd.colorscheme 'gruvbox'
+  end
+end, { desc = 'Toggle light/dark theme' })
 
 -- disable netrw for nvim-tree
 vim.g.loaded_netrw = 1
@@ -113,20 +127,6 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-
--- theme switcher
--- TODO lualine stuff?
-vim.keymap.set('n', '<leader>tt', function()
-  if vim.g.__bg == 'light' then
-    vim.g.__bg = 'dark'
-    vim.cmd.colorscheme 'molokai'
-    vim.cmd.colorscheme 'molokai'
-  else
-    vim.g.__bg = 'light'
-    vim.cmd.colorscheme 'peachpuff'
-    vim.cmd.colorscheme 'peachpuff'
-  end
-end, { desc = 'Toggle light/dark theme' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -510,15 +510,6 @@ require('lazy').setup({
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
-        -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-        --
-        -- Some languages (like typescript) have entire language plugins that can be useful:
-        --    https://github.com/pmizio/typescript-tools.nvim
-        --
-        -- But for many setups, the LSP (`tsserver`) will work just fine
-        -- tsserver = {},
-        --
-
         lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
@@ -536,11 +527,6 @@ require('lazy').setup({
       }
 
       -- Ensure the servers and tools above are installed
-      --  To check the current status of installed tools and/or manually install
-      --  other tools, you can run
-      --    :Mason
-      --
-      --  You can press `g?` for help in this menu.
       require('mason').setup()
 
       -- You can add other tools here that you want Mason to install
@@ -573,7 +559,7 @@ require('lazy').setup({
         tools = {},
         -- LSP configuration
         server = {
-          on_attach = function(_client, bufnr)
+          on_attach = function()
             -- TODO rust-analyzer keymaps
             vim.keymap.set('n', '<leader>ih', function()
               vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled())
@@ -775,7 +761,6 @@ require('lazy').setup({
         verbose = { read = true, write = true, delete = true },
       }
 
-      --- TODO use lualine, but improve setup
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
@@ -804,12 +789,7 @@ require('lazy').setup({
       auto_install = true,
       highlight = {
         enable = true,
-        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-        --  If you are experiencing weird indenting issues, add the language to
-        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
       },
-      indent = { enable = true, disable = { 'ruby' } },
       textobjects = {
         select = {
           enable = true,
@@ -892,6 +872,7 @@ require('lazy').setup({
 
   {
     'NeogitOrg/neogit',
+    branch = 'nightly',
     dependencies = {
       'nvim-lua/plenary.nvim', -- required
       'sindrets/diffview.nvim', -- optional - Diff integration
@@ -918,16 +899,28 @@ require('lazy').setup({
         local fork_point = 'develop'
         local mergebase = vim.fn.system({ 'git', 'merge-base', '--fork-point', fork_point }):gsub('%s*$', '')
         require('diffview').open { mergebase }
-      end, { desc = 'Neo[G]it' })
+      end, { desc = 'Diffview with merge base' })
+      vim.keymap.set('n', '<leader>gf', ':DiffviewFileHistory %<cr>', { desc = 'Diffview current file history' })
     end,
   },
   {
     --- adds default mappings
     --- let g:gh_line_map = '<leader>gh'
-    --- let g:gh_line_blame_map = '<leader>gb'
     --- let g:gh_line_repo_view (??) = '<leader>go'
+    --- vim.g.gh_line_blame_map = '<leader>gb'
     'ruanyl/vim-gh-line',
   },
+  {
+    'ellisonleao/gruvbox.nvim',
+    priority = 1000,
+    config = function()
+      vim.opt.background = 'dark'
+      vim.cmd.colorscheme 'gruvbox'
+      -- theme switcher
+      -- TODO lualine stuff?
+    end,
+  },
+  { 'sainnhe/everforest', priority = 1000 },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
