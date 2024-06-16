@@ -213,6 +213,7 @@ require('lazy').setup({
       map_not_git('<leader>hp', 'preview_hunk', 'Preview hunk')
       map_not_git('<leader>hP', 'preview_hunk_inline', 'Preview hunk inline')
       map_not_git('<leader>hu', 'reset_hunk', 'Undo hunk')
+      map_not_git('<leader>gB', 'blame_line', 'Blame line')
     end,
   },
 
